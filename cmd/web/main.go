@@ -32,6 +32,9 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "web:passw0rd@/snippetbox?parseTime=true", "MySQL data source name")
 	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret key")
+	staticDir := flag.String("static-dir", "./ui/html", "Path to static assets directory")
+	tlsCert := flag.String("tls-cert", "./tls/cert.pem", "Path to TLS certificate")
+	tlsKey := flag.String("tls-key", "./tls/key.pem", "Path to TLS key")
 
 	flag.Parse()
 
@@ -45,7 +48,7 @@ func main() {
 	defer db.Close()
 
 	// Initialize a new template cache...
-	templateCache, err := newTemplateCache("./ui/html")
+	templateCache, err := newTemplateCache(*staticDir)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
@@ -85,7 +88,7 @@ func main() {
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)
-	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	err = srv.ListenAndServeTLS(*tlsCert, *tlsKey)
 	errorLog.Fatal(err)
 }
 

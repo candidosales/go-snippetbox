@@ -26,7 +26,9 @@
 
 ### Considerations
 
-* Every request is handled in it’s own goroutine.
+* All configuration variable have to be a environment variable
+* Every request is handled in it’s own goroutine
+* Function name start with capital letter
 
 ### Development
 
@@ -35,8 +37,18 @@ go rub cmd/web/*
 go run cmd/web/!(*_test).go
 ```
 
+Note: If you get an event not found error when running this command, you probably need to enable extended globbing in your bash terminal first. You can do this by running:
+
+```bash
+shopt -s extglob
+```
+
 ### Tests
 
 ```bash
 go test -v ./cmd/web
 ```
+
+## Reference
+
+* https://github.com/cullenjett/snippetbox
