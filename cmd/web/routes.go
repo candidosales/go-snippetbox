@@ -11,11 +11,24 @@ func (app *application) routes() http.Handler {
 
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
+	// Create a new middleware chain containing the middleware specific to
+	// our dynamic application routes. For now, this chain will only contain
+	// the session middleware but we'll add more to it later.
+	dynamicMiddleware := alice.New(app.session.Enable, noSurf, app.authenticate)
+	dynamicWithAuthenticationMiddleware := dynamicMiddleware.Append(app.requireAuthenticatedUser)
+
 	mux := pat.New()
-	mux.Get("/", http.HandlerFunc(app.home))
-	mux.Get("/snippet/create", http.HandlerFunc(app.createSnippetForm))
-	mux.Post("/snippet/create", http.HandlerFunc(app.createSnippet))
-	mux.Get("/snippet/:id", http.HandlerFunc(app.showSnippet))
+	mux.Get("/", dynamicMiddleware.ThenFunc(app.home))
+	mux.Get("/snippet/create", dynamicWithAuthenticationMiddleware.ThenFunc(http.HandlerFunc(app.createSnippetForm)))
+	mux.Post("/snippet/create", dynamicMiddleware.ThenFunc(app.createSnippet))
+	mux.Get("/snippet/:id", dynamicMiddleware.ThenFunc(app.showSnippet))
+
+	mux.Get("/user/signup", dynamicMiddleware.ThenFunc(app.signupUserForm))
+	mux.Post("/user/signup", dynamicMiddleware.ThenFunc(app.signupUser))
+
+	mux.Get("/user/login", dynamicMiddleware.ThenFunc(app.loginUserForm))
+	mux.Post("/user/login", dynamicMiddleware.ThenFunc(app.loginUser))
+	mux.Post("/user/logout", dynamicWithAuthenticationMiddleware.ThenFunc(app.logoutUser))
 
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))
@@ -23,7 +36,5 @@ func (app *application) routes() http.Handler {
 	// Pass the servermux as the 'next' parameter to the secureHeaders middleware.
 	// Because secureHeaders is just a function, and the function return a
 	// http.Handler we don't need to do anything else.
-
-	// return app.logRequest(secureHeaders(mux))
 	return standardMiddleware.Then(mux)
 }
