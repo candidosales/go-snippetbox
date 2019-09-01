@@ -18,7 +18,7 @@ type templateData struct {
 	Snippets          []*models.Snippet
 }
 
-func humanDate(t time.Time) string {
+func HumanDate(t time.Time) string {
 
 	if t.IsZero() {
 		return ""
@@ -31,10 +31,10 @@ func humanDate(t time.Time) string {
 // essentially a string-keyed map which acts as a lookup between the names of our
 // custom template functions and the functions themselves.
 var functions = template.FuncMap{
-	"humanDate": humanDate,
+	"humanDate": HumanDate,
 }
 
-func newTemplateCache(dir string) (map[string]*template.Template, error) {
+func NewTemplateCache(dir string) (map[string]*template.Template, error) {
 
 	// Initialize a new map to act as the cache.
 	cache := map[string]*template.Template{}

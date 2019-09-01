@@ -8,20 +8,20 @@ import (
 	"strconv"
 )
 
-func (app *application) home(w http.ResponseWriter, r *http.Request) {
+func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 	s, err := app.snippets.Latest()
 	if err != nil {
-		app.serverError(w, err)
+		app.ServerError(w, err)
 		return
 	}
-	app.render(w, r, "home.page.tmpl", &templateData{Snippets: s})
+	app.Render(w, r, "home.page.tmpl", &templateData{Snippets: s})
 }
 
-func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
-		app.notFound(w)
+		app.NotFound(w)
 		return
 	}
 	// Use the SnippetModel object's Get method to retrieve the data for a
@@ -29,21 +29,21 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	// return a 404 Not Found response.
 	s, err := app.snippets.Get(id)
 	if err == models.ErrNoRecord {
-		app.notFound(w)
+		app.NotFound(w)
 		return
 	} else if err != nil {
-		app.serverError(w, err)
+		app.ServerError(w, err)
 		return
 	}
 
-	app.render(w, r, "show.page.tmpl", &templateData{Snippet: s})
+	app.Render(w, r, "show.page.tmpl", &templateData{Snippet: s})
 }
 
-func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "create.page.tmpl", &templateData{Form: forms.New(nil)})
+func (app *application) CreateSnippetForm(w http.ResponseWriter, r *http.Request) {
+	app.Render(w, r, "create.page.tmpl", &templateData{Form: forms.New(nil)})
 }
 
-func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	// First we call r.ParseForm() which adds any data in POST request bodies
 	// to the r.PostForm map. This also works in the same way for PUT and PATCH
 	// requests. If there are any errors, we use our app.ClientError helper to send
@@ -51,7 +51,7 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -63,14 +63,14 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	form.PermittedValues("expires", "365", "7", "1")
 
 	if !form.Valid() {
-		app.render(w, r, "create.page.tmpl", &templateData{Form: form})
+		app.Render(w, r, "create.page.tmpl", &templateData{Form: form})
 		return
 	}
 
 	// Create a new snippet record in the database using the form data.
 	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
 	if err != nil {
-		app.serverError(w, err)
+		app.ServerError(w, err)
 		return
 	}
 
@@ -85,15 +85,15 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
 
-func (app *application) signupUserForm(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "signup.page.tmpl", &templateData{Form: forms.New(nil)})
+func (app *application) SignupUserForm(w http.ResponseWriter, r *http.Request) {
+	app.Render(w, r, "signup.page.tmpl", &templateData{Form: forms.New(nil)})
 }
 
-func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) SignupUser(w http.ResponseWriter, r *http.Request) {
 	// Parse the form data.
 	err := r.ParseForm()
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 	form.MinLength("password", 10)
 	// If there are any errors, redisplay the signup form.
 	if !form.Valid() {
-		app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
+		app.Render(w, r, "signup.page.tmpl", &templateData{Form: form})
 		return
 	}
 
@@ -113,10 +113,10 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 	err = app.users.Insert(form.Get("name"), form.Get("email"), form.Get("password"))
 	if err == models.ErrDuplicateEmail {
 		form.Errors.Add("email", "Address is already in use")
-		app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
+		app.Render(w, r, "signup.page.tmpl", &templateData{Form: form})
 		return
 	} else if err != nil {
-		app.serverError(w, err)
+		app.ServerError(w, err)
 		return
 	}
 
@@ -127,14 +127,14 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
-func (app *application) loginUserForm(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "login.page.tmpl", &templateData{Form: forms.New(nil)})
+func (app *application) LoginUserForm(w http.ResponseWriter, r *http.Request) {
+	app.Render(w, r, "login.page.tmpl", &templateData{Form: forms.New(nil)})
 }
 
-func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -145,10 +145,10 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	if err == models.ErrInvalidCredentials {
 		form.Errors.Add("generic", "Email or Password is incorrect")
-		app.render(w, r, "login.page.tmpl", &templateData{Form: form})
+		app.Render(w, r, "login.page.tmpl", &templateData{Form: form})
 		return
 	} else if err != nil {
-		app.serverError(w, err)
+		app.ServerError(w, err)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
 }
 
-func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) LogoutUser(w http.ResponseWriter, r *http.Request) {
 	// Remove the userID from the session data so that the user is 'logged out'.
 	app.session.Remove(r, "userID")
 

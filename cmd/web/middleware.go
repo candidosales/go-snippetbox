@@ -9,7 +9,7 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-func secureHeaders(next http.Handler) http.Handler {
+func SecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-XSS-Protection", "1;mode=block")
 		w.Header().Set("X-Frame-Options", "deny")
@@ -17,14 +17,14 @@ func secureHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func (app *application) logRequest(next http.Handler) http.Handler {
+func (app *application) LogRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		app.infoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.RequestURI())
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (app *application) recoverPanic(next http.Handler) http.Handler {
+func (app *application) RecoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Create a deferred function (which will always be run in the event
 		// of a panic as Go unwinds the stack).
@@ -33,19 +33,19 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 			// panic or not. If there has...
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
-				app.serverError(w, fmt.Errorf("%s", err))
+				app.ServerError(w, fmt.Errorf("%s", err))
 			}
 		}()
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler {
+func (app *application) RequireAuthenticatedUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the user is not authenticated, redirect them to the login page and
 		// return from the middleware chain so that no subsequent handlers in
 		// the chain are executed.
-		if app.authenticatedUser(r) == nil {
+		if app.AuthenticatedUser(r) == nil {
 			http.Redirect(w, r, "/user/login", 302)
 			return
 		}
@@ -54,7 +54,7 @@ func (app *application) requireAuthenticatedUser(next http.Handler) http.Handler
 	})
 }
 
-func (app *application) authenticate(next http.Handler) http.Handler {
+func (app *application) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check if a userID value exists in the session. If this *isn't
 		// present* then call the next handler in the chain as normal.
@@ -74,7 +74,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 
 			return
 		} else if err != nil {
-			app.serverError(w, err)
+			app.ServerError(w, err)
 
 			return
 		}
@@ -90,7 +90,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 
 // Create a NoSurf middleware function which uses a customized CSRF cookie with
 // the Secure, Path and HttpOnly flags set.
-func noSurf(next http.Handler) http.Handler {
+func NoSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
