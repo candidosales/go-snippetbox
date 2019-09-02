@@ -30,7 +30,7 @@ func (app *application) routes() http.Handler {
 	mux.Post("/user/login", dynamicMiddleware.ThenFunc(app.LoginUser))
 	mux.Post("/user/logout", dynamicWithAuthenticationMiddleware.ThenFunc(app.LogoutUser))
 
-	fileServer := http.FileServer(http.Dir("./ui/static"))
+	fileServer := http.FileServer(http.Dir("./web/static"))
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))
 
 	// Pass the servermux as the 'next' parameter to the secureHeaders middleware.

@@ -32,7 +32,7 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "web:passw0rd@/snippetbox?parseTime=true", "MySQL data source name")
 	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret key")
-	staticDir := flag.String("static-dir", "./ui/html", "Path to static assets directory")
+	staticDir := flag.String("static-dir", "./web/template", "Path to static assets directory")
 	tlsCert := flag.String("tls-cert", "./tls/cert.pem", "Path to TLS certificate")
 	tlsKey := flag.String("tls-key", "./tls/key.pem", "Path to TLS key")
 

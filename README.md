@@ -23,6 +23,7 @@
 * Learning Go’s Concurrency Through Illustrations: https://medium.com/@trevor4e/learning-gos-concurrency-through-illustrations-8c4aff603b3
 * Awesome Go: https://github.com/avelino/awesome-go
 * Projects in Go: https://github.com/golang/go/wiki/Projects
+* Standard Go Project Layout: https://github.com/golang-standards/project-layout
 
 ### Considerations
 
@@ -33,8 +34,8 @@
 ### Development
 
 ```bash
-go rub cmd/web/*
-go run cmd/web/!(*_test).go
+go rub cmd/snippetbox/*
+go run cmd/snippetbox/!(*_test).go
 ```
 
 Note: If you get an event not found error when running this command, you probably need to enable extended globbing in your bash terminal first. You can do this by running:
@@ -52,3 +53,8 @@ go test -v ./cmd/web
 ## Reference
 
 * https://github.com/cullenjett/snippetbox
+
+
+## Libraries
+
+* Test: https://github.com/stretchr/testify

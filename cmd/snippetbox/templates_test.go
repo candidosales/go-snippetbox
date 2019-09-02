@@ -23,7 +23,7 @@ func TestHumanDate(t *testing.T) {
 		// identify the sub-test in any log output) and the second parameter is
 		// and anonymous function containing the actual test for each case.
 		t.Run(tt.name, func(t *testing.T) {
-			hd := humanDate(tt.tm)
+			hd := HumanDate(tt.tm)
 			if hd != tt.want {
 				t.Errorf("want %q; got %q", tt.want, hd)
 			}
