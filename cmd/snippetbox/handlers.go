@@ -112,7 +112,7 @@ func (app *application) SignupUser(w http.ResponseWriter, r *http.Request) {
 	// add an error message to the form and re-display it.
 	err = app.users.Insert(form.Get("name"), form.Get("email"), form.Get("password"))
 	if err == models.ErrDuplicateEmail {
-		form.Errors.Add("email", "Address is already in use")
+		form.Errors.Add("email", "Email is already in use")
 		app.Render(w, r, "signup.page.tmpl", &templateData{Form: form})
 		return
 	} else if err != nil {
