@@ -33,6 +33,12 @@
 
 ### Development
 
+Generate certificates
+
+```bash
+go run $GOROOT/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
+```
+
 ```bash
 go rub cmd/snippetbox/*
 go run cmd/snippetbox/!(*_test).go
@@ -58,3 +64,4 @@ go test -v ./cmd/web
 ## Libraries
 
 * Test: https://github.com/stretchr/testify
+* Middleware chaining: https://github.com/justinas/alice
