@@ -20,21 +20,25 @@ type contextKey string
 
 var contextKeyUser = contextKey("user")
 
+type SnippetsInterface interface {
+	Insert(string, string, string) (int, error)
+	Get(int) (*models.Snippet, error)
+	Latest() ([]*models.Snippet, error)
+}
+
+type UsersInterface interface {
+	Insert(string, string, string) error
+	Authenticate(string, string) (int, error)
+	Get(int) (*models.User, error)
+}
+
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	session  *sessions.Session
-	snippets interface {
-		Insert(string, string, string) (int, error)
-		Get(int) (*models.Snippet, error)
-		Latest() ([]*models.Snippet, error)
-	}
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	session       *sessions.Session
+	snippets      SnippetsInterface
 	templateCache map[string]*template.Template
-	users         interface {
-		Insert(string, string, string) error
-		Authenticate(string, string) (int, error)
-		Get(int) (*models.User, error)
-	}
+	users         UsersInterface
 }
 
 func main() {
